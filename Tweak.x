@@ -142,7 +142,8 @@ static void SSUpdateTextAutosizing(UIWebDocumentView *view, CGFloat scale) {
         MSHookMessageEx([frame class], sel, (IMP)&SSSetTextAutosizingWidth, (IMP *)&SSOrigSetTextAutosizingWidth);
     NSNumber *old = objc_getAssociatedObject(frame, &kSSAutosizingScaleKey);
     NSNumber *now = scale < 0.999 ? @(scale) : nil;
-    if (old == now || [old isEqualToNumber:now]) return;
+    // (-isEqualToNumber: throws on nil, and nil is what 100% looks like here.)
+    if ((!old && !now) || (old && now && [old isEqualToNumber:now])) return;
     objc_setAssociatedObject(frame, &kSSAutosizingScaleKey, now, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     NSNumber *width = objc_getAssociatedObject(frame, &kSSAutosizingWidthKey) ?: @(SSDeviceSize().width);
     [frame _setTextAutosizingWidth:width.floatValue];   // goes through the hook, which divides by the scale
