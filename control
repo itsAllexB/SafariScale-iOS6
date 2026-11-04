@@ -1,8 +1,8 @@
 Package: com.itsallexb.safariscale
 Name: SafariScale (iOS 6)
-Version: 1.0.0
+Version: 1.1.0
 Architecture: iphoneos-arm
-Description: Makes web pages in Safari smaller on iOS 6, so modern sites made for bigger phones stop looking cramped. Pages are laid out wider and shown smaller, like zooming out in a desktop browser, so links, forms, pinch zoom and rotation keep working. 80% by default, 50-100% in Settings > Safari Scale. Works with Web Port, including its own zoom controls.
+Description: Makes web pages in Safari smaller on iOS 6, so modern sites made for much bigger phones stop looking cramped. Pages are laid out wider and shown smaller, like zooming out in a desktop browser, so links, forms, pinch zoom and rotation keep working. 80% by default, 30-100% in Settings > Safari Scale. Works with Web Port, including its own zoom controls.
 Maintainer: itsAllexB
 Author: itsAllexB
 Section: Tweaks

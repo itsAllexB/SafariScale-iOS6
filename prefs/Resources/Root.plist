@@ -49,6 +49,8 @@ Pages that are already open update when you go back to Safari.</string>
 			<string>Page Size</string>
 			<key>shortTitles</key>
 			<array>
+				<string>30%</string>
+				<string>40%</string>
 				<string>50%</string>
 				<string>60%</string>
 				<string>70%</string>
@@ -58,6 +60,8 @@ Pages that are already open update when you go back to Safari.</string>
 			</array>
 			<key>validTitles</key>
 			<array>
+				<string>30%</string>
+				<string>40%</string>
 				<string>50%</string>
 				<string>60%</string>
 				<string>70%</string>
@@ -67,6 +71,8 @@ Pages that are already open update when you go back to Safari.</string>
 			</array>
 			<key>validValues</key>
 			<array>
+				<integer>30</integer>
+				<integer>40</integer>
 				<integer>50</integer>
 				<integer>60</integer>
 				<integer>70</integer>

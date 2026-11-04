@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 itsAllexB
 
-// SafariScale 1.0.0
+// SafariScale 1.1.0
 // Makes web pages in Safari (iOS 6) smaller, like zooming out in a desktop browser.
 //
 // How Safari sizes a page (UIKit, iOS 6.1.3, checked on an iPhone 4S):
@@ -14,7 +14,7 @@
 //   (WebCore's ValueDeviceWidth / ValueDeviceHeight), so both forms are handled.
 //
 // What SafariScale changes, for pages that size themselves to the device (width=device-width,
-// or only an initial-scale), at scale s (0.5 ... 1.0):
+// or only an initial-scale), at scale s (0.3 ... 1.0):
 //   width  -> device width / s      (320 pt at 80% becomes a 400 CSS px wide layout)
 //   height -> device height / s     (only when it is device-height)
 //   initial-, minimum- and maximum-scale -> value * s
@@ -79,7 +79,7 @@ static void SSLoadPreferences(void) {
     gEnabled = [enabled respondsToSelector:@selector(boolValue)] ? [enabled boolValue] : YES;
     NSInteger p = [percent respondsToSelector:@selector(integerValue)] ? [percent integerValue] : 80;
     p = ((p + 5) / 10) * 10;                       // steps of 10%
-    gPercent = MAX(50, MIN(100, p));
+    gPercent = MAX(30, MIN(100, p));
 }
 
 #pragma mark - Viewport arguments
