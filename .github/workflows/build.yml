@@ -39,6 +39,9 @@ jobs:
       - name: Build
         run: make package FINALPACKAGE=1
 
+      - name: Build the dev-only debug helper (not part of the release)
+        run: make -C devtools/SafariScaleDebug package FINALPACKAGE=1
+
       - name: Check the binaries
         run: |
           for f in .theos/_/Library/MobileSubstrate/DynamicLibraries/SafariScale.dylib .theos/_/Library/PreferenceBundles/SafariScalePrefs.bundle/SafariScalePrefs; do
@@ -55,6 +58,11 @@ jobs:
         with:
           name: deb
           path: packages/*.deb
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: debug-deb
+          path: devtools/SafariScaleDebug/packages/*.deb
 
       - name: Release
         if: startsWith(github.ref, 'refs/tags/v')

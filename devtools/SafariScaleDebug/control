@@ -1,0 +1,9 @@
+Package: com.itsallexb.safariscale.debug
+Name: SafariScale Debug (dev only)
+Version: 0.1.0
+Architecture: iphoneos-arm
+Description: Development tool for SafariScale: runs /tmp/ssdebug.js in Safari's visible page when com.itsallexb.safariscale.debug/run is posted and writes the result to /tmp/ssdebug.out. Not for normal use.
+Maintainer: itsAllexB
+Author: itsAllexB
+Section: Development
+Depends: mobilesubstrate, firmware (>= 6.0), firmware (<< 8.0)
