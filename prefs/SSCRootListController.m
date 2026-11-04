@@ -2,13 +2,24 @@
 // Copyright (C) 2026 itsAllexB
 
 #import <UIKit/UIKit.h>
-#import <Preferences/PSListController.h>
-#import <Preferences/PSSpecifier.h>
 
-@interface PGSRootListController : PSListController
+// The few Preferences.framework (private) declarations this pane needs, valid from iOS 6 on.
+// Declared here rather than imported so it builds with the iOS 9.3 SDK, which armv7 needs.
+@interface PSSpecifier : NSObject
+- (id)propertyForKey:(NSString *)key;
 @end
 
-@implementation PGSRootListController
+@interface PSListController : UIViewController {
+    NSArray *_specifiers;
+}
+- (NSArray *)loadSpecifiersFromPlistName:(NSString *)name target:(id)target;
+- (void)setPreferenceValue:(id)value specifier:(PSSpecifier *)specifier;
+@end
+
+@interface SSCRootListController : PSListController
+@end
+
+@implementation SSCRootListController
 
 - (NSArray *)specifiers {
     if (!_specifiers) _specifiers = [self loadSpecifiersFromPlistName:@"Root" target:self];

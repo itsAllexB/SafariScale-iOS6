@@ -4,11 +4,11 @@ ARCHS = armv7 arm64
 
 include $(THEOS)/makefiles/common.mk
 
-BUNDLE_NAME = PageScalePrefs
-PageScalePrefs_FILES = PGSRootListController.m
-PageScalePrefs_FRAMEWORKS = UIKit
-PageScalePrefs_PRIVATE_FRAMEWORKS = Preferences
-PageScalePrefs_INSTALL_PATH = /Library/PreferenceBundles
-PageScalePrefs_CFLAGS = -fobjc-arc
+BUNDLE_NAME = SafariScalePrefs
+SafariScalePrefs_FILES = SSCRootListController.m
+SafariScalePrefs_FRAMEWORKS = UIKit
+SafariScalePrefs_PRIVATE_FRAMEWORKS = Preferences
+SafariScalePrefs_INSTALL_PATH = /Library/PreferenceBundles
+SafariScalePrefs_CFLAGS = -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/bundle.mk

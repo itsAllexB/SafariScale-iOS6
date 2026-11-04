@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 itsAllexB
 
-// PageScale 1.0.0
+// SafariScale 1.0.0
 // Makes web pages in Safari (iOS 6 and 7) smaller, like zooming out in a desktop browser.
 //
 // How Safari sizes a page (UIKit, iOS 6.1.3, checked on an iPhone 4S):
@@ -13,7 +13,7 @@
 //   in points (320 on iPhone, 768 on iPad). Web Port's modern WebKit may pass -2 / -3 instead
 //   (WebCore's ValueDeviceWidth / ValueDeviceHeight), so both forms are handled.
 //
-// What PageScale changes, for pages that size themselves to the device (width=device-width,
+// What SafariScale changes, for pages that size themselves to the device (width=device-width,
 // or only an initial-scale), at scale s (0.5 ... 1.0):
 //   width  -> device width / s      (320 pt at 80% becomes a 400 CSS px wide layout)
 //   height -> device height / s     (only when it is device-height)
@@ -27,19 +27,35 @@
 // and with Web Port's (which installs its own handler for the delegate method), whatever order the
 // tweaks load in.
 //
+// Text autosizing: iOS enlarges text that would be too small to read in the visible width. Safari tells
+// WebKit that width on every load with -[WebFrame _setTextAutosizingWidth:] (320 on an iPhone). With the
+// page laid out 400 px wide, 320 would make WebKit inflate the text again (Hacker News: 15 px became
+// 17 px at 80%), undoing the change. So for scaled pages that width is divided by s as well: autosizing
+// then works on the page exactly as it does at 100%.
+//
 // Settings changes: the original arguments of every page we scaled are kept on its view. When Safari
 // comes back to the front after a change, they're applied again, so open pages update in place
 // without reloading (form contents and scroll position are kept).
 
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
+#import <substrate.h>
 
-#define kPSDomain CFSTR("com.itsallexb.pagescale")
-#define kPSNotification "com.itsallexb.pagescale/prefschanged"
-static NSString *const kPSPrefsPath = @"/var/mobile/Library/Preferences/com.itsallexb.pagescale.plist";
-static NSString *const kPSScaledMarker = @"com.itsallexb.pagescale.scaled";   // set on dictionaries we made
+#define kSSDomain CFSTR("com.itsallexb.safariscale")
+#define kSSNotification "com.itsallexb.safariscale/prefschanged"
+static NSString *const kSSPrefsPath = @"/var/mobile/Library/Preferences/com.itsallexb.safariscale.plist";
+static NSString *const kSSScaledMarker = @"com.itsallexb.safariscale.scaled";   // set on dictionaries we made
+
+@interface WebFrame : NSObject
+- (void)_setTextAutosizingWidth:(float)width;
+@end
+
+@interface WebView : NSObject
+- (WebFrame *)mainFrame;
+@end
 
 @interface UIWebDocumentView : UIView
+- (WebView *)webView;
 - (unsigned int)_applyViewportArguments:(NSDictionary *)arguments;
 - (void)viewportConfigurationsDidChange:(unsigned int)mask;
 @end
@@ -50,15 +66,15 @@ static BOOL gEnabled = YES;
 static NSInteger gPercent = 80;
 static BOOL gNeedsReapply = NO;
 
-static CGFloat PSScale(void) {
+static CGFloat SSScale(void) {
     return gEnabled ? gPercent / 100.0 : 1.0;
 }
 
-static void PSLoadPreferences(void) {
+static void SSLoadPreferences(void) {
     // Read the plist the Settings pane writes; CFPreferences is only the fallback when there is no file yet.
-    NSDictionary *file = [NSDictionary dictionaryWithContentsOfFile:kPSPrefsPath];
-    id enabled = file ? file[@"enabled"] : CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("enabled"), kPSDomain));
-    id percent = file ? file[@"percent"] : CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("percent"), kPSDomain));
+    NSDictionary *file = [NSDictionary dictionaryWithContentsOfFile:kSSPrefsPath];
+    id enabled = file ? file[@"enabled"] : CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("enabled"), kSSDomain));
+    id percent = file ? file[@"percent"] : CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("percent"), kSSDomain));
     gEnabled = [enabled respondsToSelector:@selector(boolValue)] ? [enabled boolValue] : YES;
     NSInteger p = [percent respondsToSelector:@selector(integerValue)] ? [percent integerValue] : 80;
     p = ((p + 5) / 10) * 10;                       // steps of 10%
@@ -67,12 +83,12 @@ static void PSLoadPreferences(void) {
 
 #pragma mark - Viewport arguments
 
-static float PSFloat(NSDictionary *d, NSString *key) {
+static float SSFloat(NSDictionary *d, NSString *key) {
     id v = d[key];
     return [v respondsToSelector:@selector(floatValue)] ? [v floatValue] : -1;
 }
 
-static CGSize PSDeviceSize(void) {
+static CGSize SSDeviceSize(void) {
     // Portrait size in points. On iOS 6 and 7, UIScreen bounds don't rotate.
     CGSize s = [UIScreen mainScreen].bounds.size;
     return CGSizeMake(MIN(s.width, s.height), MAX(s.width, s.height));
@@ -80,55 +96,91 @@ static CGSize PSDeviceSize(void) {
 
 // YES for pages that size themselves to the device: the only ones that look cramped and the only
 // ones scaling makes sense for.
-static BOOL PSIsDeviceSized(NSDictionary *args) {
+static BOOL SSIsDeviceSized(NSDictionary *args) {
     if (![args isKindOfClass:[NSDictionary class]]) return NO;
-    float width = PSFloat(args, @"width");
+    float width = SSFloat(args, @"width");
     if (width == -2) return YES;                                         // device-width, unresolved
-    if (fabsf(width - PSDeviceSize().width) < 0.5f) return YES;          // device-width, resolved
-    return width == -1 && PSFloat(args, @"initial-scale") > 0;           // initial-scale only
+    if (fabs(width - SSDeviceSize().width) < 0.5) return YES;          // device-width, resolved
+    return width == -1 && SSFloat(args, @"initial-scale") > 0;           // initial-scale only
 }
 
-static NSDictionary *PSScaledArguments(NSDictionary *args, CGFloat scale) {
-    if (scale >= 0.999 || args[kPSScaledMarker] || !PSIsDeviceSized(args)) return args;
-    CGSize device = PSDeviceSize();
+static NSDictionary *SSScaledArguments(NSDictionary *args, CGFloat scale) {
+    if (scale >= 0.999 || args[kSSScaledMarker] || !SSIsDeviceSized(args)) return args;
+    CGSize device = SSDeviceSize();
     NSMutableDictionary *scaled = [args mutableCopy];
-    float width = PSFloat(args, @"width"), height = PSFloat(args, @"height");
+    float width = SSFloat(args, @"width"), height = SSFloat(args, @"height");
     if (width != -1) scaled[@"width"] = @(roundf(device.width / scale));
-    if (height == -3 || fabsf(height - device.height) < 0.5f) scaled[@"height"] = @(roundf(device.height / scale));
+    if (height == -3 || fabs(height - device.height) < 0.5) scaled[@"height"] = @(roundf(device.height / scale));
     for (NSString *key in @[ @"initial-scale", @"minimum-scale", @"maximum-scale" ]) {
-        float value = PSFloat(args, key);
+        float value = SSFloat(args, key);
         if (value > 0) scaled[key] = @(value * scale);
     }
-    scaled[kPSScaledMarker] = @(scale);
+    scaled[kSSScaledMarker] = @(scale);
     return scaled;
+}
+
+#pragma mark - Text autosizing
+
+static char kSSAutosizingWidthKey;   // on a WebFrame: the last width Safari asked for
+static char kSSAutosizingScaleKey;   // on a WebFrame: the scale its page is shown at (absent = 1)
+
+// -[WebFrame _setTextAutosizingWidth:] is hooked on the frame's actual class the first time a page is
+// scaled. WebFrame comes from Apple's WebKit or from Web Port's, and the right one may not be loaded yet
+// when this tweak starts.
+static void (*SSOrigSetTextAutosizingWidth)(id, SEL, float);
+static void SSSetTextAutosizingWidth(id self, SEL _cmd, float width) {
+    objc_setAssociatedObject(self, &kSSAutosizingWidthKey, @(width), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    NSNumber *scale = objc_getAssociatedObject(self, &kSSAutosizingScaleKey);
+    SSOrigSetTextAutosizingWidth(self, _cmd, scale ? width / scale.floatValue : width);
+}
+
+static void SSUpdateTextAutosizing(UIWebDocumentView *view, CGFloat scale) {
+    WebFrame *frame = [view respondsToSelector:@selector(webView)] ? [[view webView] mainFrame] : nil;
+    SEL sel = @selector(_setTextAutosizingWidth:);
+    if (![frame respondsToSelector:sel]) return;
+    if (!SSOrigSetTextAutosizingWidth)
+        MSHookMessageEx([frame class], sel, (IMP)&SSSetTextAutosizingWidth, (IMP *)&SSOrigSetTextAutosizingWidth);
+    NSNumber *old = objc_getAssociatedObject(frame, &kSSAutosizingScaleKey);
+    NSNumber *now = scale < 0.999 ? @(scale) : nil;
+    if (old == now || [old isEqualToNumber:now]) return;
+    objc_setAssociatedObject(frame, &kSSAutosizingScaleKey, now, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    NSNumber *width = objc_getAssociatedObject(frame, &kSSAutosizingWidthKey) ?: @(SSDeviceSize().width);
+    [frame _setTextAutosizingWidth:width.floatValue];   // goes through the hook, which divides by the scale
+    // Text already laid out keeps its old size unless autosizing is redone on the next layout.
+    if ([frame respondsToSelector:@selector(resetTextAutosizingBeforeLayout)])
+        [frame performSelector:@selector(resetTextAutosizingBeforeLayout)];
 }
 
 #pragma mark - Hooks
 
 static NSHashTable *gScaledViews;                    // weak; views showing a device-sized page
-static char kPSOriginalArgumentsKey;
+static char kSSOriginalArgumentsKey;
 
 %hook UIWebDocumentView
 
 - (unsigned int)_applyViewportArguments:(NSDictionary *)arguments {
-    if (![arguments isKindOfClass:[NSDictionary class]] || arguments[kPSScaledMarker]) return %orig;
-    if (PSIsDeviceSized(arguments)) {
-        objc_setAssociatedObject(self, &kPSOriginalArgumentsKey, arguments, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    if (![arguments isKindOfClass:[NSDictionary class]] || arguments[kSSScaledMarker]) return %orig;
+    BOOL deviceSized = SSIsDeviceSized(arguments);
+    if (deviceSized) {
+        objc_setAssociatedObject(self, &kSSOriginalArgumentsKey, arguments, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         [gScaledViews addObject:self];
     } else {
         // A new page without a device-sized viewport: forget the old one.
-        objc_setAssociatedObject(self, &kPSOriginalArgumentsKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        objc_setAssociatedObject(self, &kSSOriginalArgumentsKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         [gScaledViews removeObject:self];
     }
-    return %orig(PSScaledArguments(arguments, PSScale()));
+    CGFloat scale = deviceSized ? SSScale() : 1.0;
+    unsigned int changed = %orig(SSScaledArguments(arguments, scale));
+    SSUpdateTextAutosizing(self, scale);
+    return changed;
 }
 
 %end
 
-static void PSReapplyAll(void) {
+static void SSReapplyAll(void) {
     gNeedsReapply = NO;
     for (UIWebDocumentView *view in [gScaledViews allObjects]) {
-        NSDictionary *original = objc_getAssociatedObject(view, &kPSOriginalArgumentsKey);
+        NSDictionary *original = objc_getAssociatedObject(view, &kSSOriginalArgumentsKey);
         if (!original) continue;
         unsigned int changed = [view _applyViewportArguments:original];
         if ([view respondsToSelector:@selector(viewportConfigurationsDidChange:)])
@@ -138,30 +190,30 @@ static void PSReapplyAll(void) {
 
 // Reloads the settings. When the scale changed, open pages are updated now if Safari is in front,
 // otherwise the next time it comes to the front.
-static void PSRefresh(void) {
-    CGFloat old = PSScale();
-    PSLoadPreferences();
-    if (PSScale() != old) gNeedsReapply = YES;
-    if (gNeedsReapply && [UIApplication sharedApplication].applicationState == UIApplicationStateActive) PSReapplyAll();
+static void SSRefresh(void) {
+    CGFloat old = SSScale();
+    SSLoadPreferences();
+    if (SSScale() != old) gNeedsReapply = YES;
+    if (gNeedsReapply && [UIApplication sharedApplication].applicationState == UIApplicationStateActive) SSReapplyAll();
 }
 
-static void PSPreferencesChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef info) {
-    dispatch_async(dispatch_get_main_queue(), ^{ PSRefresh(); });
+static void SSPreferencesChanged(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef info) {
+    dispatch_async(dispatch_get_main_queue(), ^{ SSRefresh(); });
 }
 
 %ctor {
     @autoreleasepool {
         if (![UIWebDocumentView instancesRespondToSelector:@selector(_applyViewportArguments:)]) {
-            NSLog(@"[PageScale] -[UIWebDocumentView _applyViewportArguments:] not found; not loading.");
+            NSLog(@"[SafariScale] -[UIWebDocumentView _applyViewportArguments:] not found; not loading.");
             return;
         }
         gScaledViews = [NSHashTable weakObjectsHashTable];
-        PSLoadPreferences();
-        CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, PSPreferencesChanged,
-                                        CFSTR(kPSNotification), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
+        SSLoadPreferences();
+        CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, SSPreferencesChanged,
+                                        CFSTR(kSSNotification), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
         [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidBecomeActiveNotification object:nil
                                                            queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
-            PSRefresh();
+            SSRefresh();
         }];
         %init;
     }

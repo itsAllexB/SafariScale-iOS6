@@ -10,10 +10,10 @@ FINALPACKAGE = 1
 
 include $(THEOS)/makefiles/common.mk
 
-TWEAK_NAME = PageScale
-PageScale_FILES = Tweak.x
-PageScale_FRAMEWORKS = UIKit
-PageScale_CFLAGS = -fobjc-arc
+TWEAK_NAME = SafariScale
+SafariScale_FILES = Tweak.x
+SafariScale_FRAMEWORKS = UIKit
+SafariScale_CFLAGS = -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 

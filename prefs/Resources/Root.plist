@@ -12,13 +12,13 @@
 		</dict>
 		<dict>
 			<key>PostNotification</key>
-			<string>com.itsallexb.pagescale/prefschanged</string>
+			<string>com.itsallexb.safariscale/prefschanged</string>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>default</key>
 			<true/>
 			<key>defaults</key>
-			<string>com.itsallexb.pagescale</string>
+			<string>com.itsallexb.safariscale</string>
 			<key>key</key>
 			<string>enabled</string>
 			<key>label</key>
@@ -34,13 +34,13 @@ Pages that are already open update when you go back to Safari.</string>
 		</dict>
 		<dict>
 			<key>PostNotification</key>
-			<string>com.itsallexb.pagescale/prefschanged</string>
+			<string>com.itsallexb.safariscale/prefschanged</string>
 			<key>cell</key>
 			<string>PSLinkListCell</string>
 			<key>default</key>
 			<integer>80</integer>
 			<key>defaults</key>
-			<string>com.itsallexb.pagescale</string>
+			<string>com.itsallexb.safariscale</string>
 			<key>detail</key>
 			<string>PSListItemsController</string>
 			<key>key</key>
@@ -77,6 +77,6 @@ Pages that are already open update when you go back to Safari.</string>
 		</dict>
 	</array>
 	<key>title</key>
-	<string>Page Scale</string>
+	<string>Safari Scale</string>
 </dict>
 </plist>

@@ -1,10 +1,10 @@
-<p align="center"><img src="icon.png" alt="PageScale icon" width="128"></p>
+<p align="center"><img src="icon.png" alt="SafariScale icon" width="128"></p>
 
-<h1 align="center">PageScale (iOS 6–7)</h1>
+<h1 align="center">SafariScale (iOS 6–7)</h1>
 
 **Makes web pages in Safari smaller on iOS 6 and 7.**
 
-Modern websites are made for phones that are much bigger than an iPhone 4S. On a 3.5-inch screen they look cramped: big text, huge buttons and very little on screen at once. PageScale shows pages at 80% of their size by default, or anywhere from 50% to 100%, so more fits on the screen.
+Modern websites are made for phones that are much bigger than an iPhone 4S. On a 3.5-inch screen they look cramped: big text, huge buttons and very little on screen at once. SafariScale shows pages at 80% of their size by default, or anywhere from 50% to 100%, so more fits on the screen.
 
 It works like zooming out in a desktop browser. The page gets a wider layout and is shown smaller. So nothing is cut off or broken: links, forms, menus, pinch zoom and rotation all keep working.
 
@@ -29,13 +29,13 @@ This is an unofficial jailbreak tweak. It is not affiliated with or endorsed by 
 
 ## Install
 
-Download the `.deb` from [Releases](https://github.com/itsAllexB/PageScale-iOS6-7/releases/latest) and install it with iFile, Filza or `dpkg -i`. Then close Safari from the app switcher and open it again.
+Download the `.deb` from [Releases](https://github.com/itsAllexB/SafariScale-iOS6-7/releases/latest) and install it with iFile, Filza or `dpkg -i`. Then close Safari from the app switcher and open it again.
 
 Requires Cydia Substrate (`mobilesubstrate`) and PreferenceLoader. Both are on almost every iOS 6 or 7 jailbreak.
 
 ## Settings
 
-Open **Settings > Page Scale**:
+Open **Settings > Safari Scale**:
 
 - **Enabled**: turns the tweak on or off.
 - **Page Size**: 50% to 100% in steps of 10%. 80% is the default.
@@ -45,19 +45,19 @@ Open **Settings > Page Scale**:
 You need [Theos](https://theos.dev/docs/installation) and the iOS 9.3 SDK from [theos/sdks](https://github.com/theos/sdks). It's the newest one that still builds armv7, which iOS 6 devices need.
 
 ```sh
-git clone https://github.com/itsAllexB/PageScale-iOS6-7.git
-cd PageScale-iOS6-7
+git clone https://github.com/itsAllexB/SafariScale-iOS6-7.git
+cd SafariScale-iOS6-7
 make package FINALPACKAGE=1
 ```
 
 The package is written to `packages/`. GitHub Actions builds it on every push (see [`.github/workflows/build.yml`](.github/workflows/build.yml)).
 
-**How it works:** WebKit reads a page's `<meta name="viewport">` and gives UIKit the width and zoom values in a dictionary, through `-[UIWebDocumentView _applyViewportArguments:]`. For pages that size themselves to the device, PageScale divides the width by the page size and multiplies the zoom values by it before UIKit uses them. At 80%, `width=device-width` becomes 400 instead of 320, and `initial-scale=1` becomes 0.8. See the comments in [`Tweak.x`](Tweak.x).
+**How it works:** WebKit reads a page's `<meta name="viewport">` and gives UIKit the width and zoom values in a dictionary, through `-[UIWebDocumentView _applyViewportArguments:]`. For pages that size themselves to the device, SafariScale divides the width by the page size and multiplies the zoom values by it before UIKit uses them. At 80%, `width=device-width` becomes 400 instead of 320, and `initial-scale=1` becomes 0.8. See the comments in [`Tweak.x`](Tweak.x).
 
 ## Credits and license
 
 Made by [itsAllexB](https://github.com/itsAllexB).
 
-PageScale is free software under the GNU General Public License v3.0 or later. See [LICENSE](LICENSE).
+SafariScale is free software under the GNU General Public License v3.0 or later. See [LICENSE](LICENSE).
 
 iPhone, iOS and Safari are trademarks of Apple Inc. This project is not affiliated with Apple.

@@ -1,0 +1,10 @@
+{
+	entry = {
+		bundle = SafariScalePrefs;
+		cell = PSLinkCell;
+		detail = SSCRootListController;
+		icon = icon.png;
+		isController = 1;
+		label = "Safari Scale";
+	};
+}
