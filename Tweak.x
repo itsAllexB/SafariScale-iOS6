@@ -137,7 +137,7 @@ static void SSSetTextAutosizingWidth(id self, SEL _cmd, float width) {
 
 // WebKit on iOS 6 and 7 runs WebCore on its own "WebThread". Anything that calls into WebKit from the
 // main thread has to hold the WebThread lock first, as UIKit does, or WebCore may be in the middle of a
-// layout (calling -resetTextAutosizingBeforeLayout without it crashed Web Port's WebCore on the 4S).
+// layout.
 // WebThreadLock() does nothing when already on the WebThread, and the main thread keeps the lock until
 // the end of the current run loop pass. Looked up at run time: it lives in Apple's WebCore or Web Port's.
 static void SSWebThreadLock(void) {
@@ -161,9 +161,8 @@ static void SSUpdateTextAutosizing(UIWebDocumentView *view, CGFloat scale) {
     objc_setAssociatedObject(frame, &kSSAutosizingScaleKey, now, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     NSNumber *width = objc_getAssociatedObject(frame, &kSSAutosizingWidthKey) ?: @(SSDeviceSize().width);
     [frame _setTextAutosizingWidth:width.floatValue];   // goes through the hook, which divides by the scale
-    // Text already laid out keeps its old size unless autosizing is redone on the next layout.
-    if ([frame respondsToSelector:@selector(resetTextAutosizingBeforeLayout)])
-        [frame performSelector:@selector(resetTextAutosizingBeforeLayout)];
+    // Not -[WebFrame resetTextAutosizingBeforeLayout]: Web Port's WebCore traps inside it (EXC_BREAKPOINT,
+    // every time, on the iPhone 4S). The new width is used on the next layout anyway.
 }
 
 #pragma mark - Hooks
