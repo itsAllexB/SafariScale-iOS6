@@ -178,8 +178,8 @@ static void SSUpdateTextAutosizing(UIWebDocumentView *view, CGFloat scale) {
     objc_setAssociatedObject(frame, &kSSAutosizingScaleKey, now, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     NSNumber *width = objc_getAssociatedObject(frame, &kSSAutosizingWidthKey) ?: @(SSDeviceSize().width);
     [frame _setTextAutosizingWidth:width.floatValue];   // goes through the hook, which divides by the scale
-    // Not -[WebFrame resetTextAutosizingBeforeLayout]: Web Port's WebCore traps inside it (EXC_BREAKPOINT,
-    // every time, on the iPhone 4S). The new width is used on the next layout anyway.
+    // No -[WebFrame resetTextAutosizingBeforeLayout] needed: the new width is used on the next layout,
+    // which the viewport change triggers (a live change looks the same as a fresh load at that size).
 }
 
 #pragma mark - Hooks
