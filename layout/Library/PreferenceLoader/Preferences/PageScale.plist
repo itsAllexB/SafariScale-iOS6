@@ -1,0 +1,10 @@
+{
+	entry = {
+		bundle = PageScalePrefs;
+		cell = PSLinkCell;
+		detail = PGSRootListController;
+		icon = icon.png;
+		isController = 1;
+		label = "Page Scale";
+	};
+}

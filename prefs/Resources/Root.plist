@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>items</key>
+	<array>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>Makes web pages in Safari smaller, so modern sites made for bigger phones stop looking cramped. Pages are laid out wider and shown smaller, like zooming out in a desktop browser, so links, forms, pinch zoom and rotation keep working.</string>
+		</dict>
+		<dict>
+			<key>PostNotification</key>
+			<string>com.itsallexb.pagescale/prefschanged</string>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.itsallexb.pagescale</string>
+			<key>key</key>
+			<string>enabled</string>
+			<key>label</key>
+			<string>Enabled</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>At 80%, text and images are shown at 80% of their usual size and pages get 25% more room in each direction. Pages that already show their desktop version are not changed.
+
+Pages that are already open update when you go back to Safari.</string>
+		</dict>
+		<dict>
+			<key>PostNotification</key>
+			<string>com.itsallexb.pagescale/prefschanged</string>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>default</key>
+			<integer>80</integer>
+			<key>defaults</key>
+			<string>com.itsallexb.pagescale</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>key</key>
+			<string>percent</string>
+			<key>label</key>
+			<string>Page Size</string>
+			<key>shortTitles</key>
+			<array>
+				<string>50%</string>
+				<string>60%</string>
+				<string>70%</string>
+				<string>80%</string>
+				<string>90%</string>
+				<string>100%</string>
+			</array>
+			<key>validTitles</key>
+			<array>
+				<string>50%</string>
+				<string>60%</string>
+				<string>70%</string>
+				<string>80%</string>
+				<string>90%</string>
+				<string>100% (iOS Default)</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>50</integer>
+				<integer>60</integer>
+				<integer>70</integer>
+				<integer>80</integer>
+				<integer>90</integer>
+				<integer>100</integer>
+			</array>
+		</dict>
+	</array>
+	<key>title</key>
+	<string>Page Scale</string>
+</dict>
+</plist>

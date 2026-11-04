@@ -1,0 +1,53 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    env:
+      THEOS: ${{ github.workspace }}/theos
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Theos, the iOS toolchain and the iOS 9.3 SDK (armv7)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential fakeroot rsync curl perl zip git libxml2 xz-utils libtinfo6
+          git clone --recursive --depth 1 https://github.com/theos/theos.git "$THEOS"
+          curl -fsSL https://github.com/L1ghtmann/llvm-project/releases/download/main-update_3-eabca92/iOSToolchain-x86_64.tar.xz | tar -xJ -C "$THEOS/toolchain/"
+          curl -fsSL https://github.com/theos/sdks/releases/download/master-146e41f/iPhoneOS9.3.sdk.tar.xz | tar -xJ -C "$THEOS/sdks/"
+          mkdir -p "$HOME/.local/bin"
+          curl -fsSL -o "$HOME/.local/bin/ldid" https://github.com/ProcursusTeam/ldid/releases/download/v2.1.5-procursus7/ldid_linux_x86_64
+          chmod +x "$HOME/.local/bin/ldid"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Build
+        run: make package FINALPACKAGE=1
+
+      - name: Check the binaries
+        run: |
+          for f in .theos/_/Library/MobileSubstrate/DynamicLibraries/PageScale.dylib .theos/_/Library/PreferenceBundles/PageScalePrefs.bundle/PageScalePrefs; do
+            echo "== $f"
+            "$THEOS/toolchain/linux/iphone/bin/otool" -arch all -l "$f" | grep -A4 -E 'LC_VERSION_MIN_IPHONEOS|LC_BUILD_VERSION' | grep -E 'cmd|version|minos' || true
+            "$THEOS/toolchain/linux/iphone/bin/lipo" -info "$f"
+          done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deb
+          path: packages/*.deb
+
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" packages/*.deb --title "$GITHUB_REF_NAME" --generate-notes
