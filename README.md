@@ -44,7 +44,15 @@ iPhone 4S, iOS 6.1.3, with Web Port. Each site at 100% (iOS default), 80% (Safar
 
 ## Install
 
-Download the `.deb` from [Releases](https://github.com/itsAllexB/SafariScale-iOS6/releases/latest) and install it with iFile, Filza or `dpkg -i`. Then close Safari from the app switcher and open it again.
+Add the **iOS Legacy** source to Cydia, then search for SafariScale:
+
+```
+https://itsallexb.github.io/ios-legacy/
+```
+
+One tap on your device: [Add to Cydia](https://itsallexb.github.io/ios-legacy/add/cydia.html)
+
+Or download the `.deb` from [Releases](https://github.com/itsAllexB/SafariScale-iOS6/releases/latest) and install it with iFile or `dpkg -i`. Then close Safari from the app switcher and open it again.
 
 Requires Cydia Substrate (`mobilesubstrate`) and PreferenceLoader. Both are on almost every iOS 6 jailbreak.
 
@@ -54,6 +62,8 @@ Open **Settings > Safari Scale**:
 
 - **Enabled**: turns the tweak on or off.
 - **Page Size**: 50% to 100% in steps of 10%. 80% is the default.
+
+<img src="screenshots/settings.png" alt="Safari Scale settings page: Enabled switch and Page Size 80%" width="320">
 
 ## Build from source
 
