@@ -2,7 +2,7 @@
 // Copyright (C) 2026 itsAllexB
 
 // SafariScale 1.0.0
-// Makes web pages in Safari (iOS 6 and 7) smaller, like zooming out in a desktop browser.
+// Makes web pages in Safari (iOS 6) smaller, like zooming out in a desktop browser.
 //
 // How Safari sizes a page (UIKit, iOS 6.1.3, checked on an iPhone 4S):
 //   WebKit parses <meta name="viewport"> and hands UIKit a dictionary:
@@ -90,7 +90,7 @@ static float SSFloat(NSDictionary *d, NSString *key) {
 }
 
 static CGSize SSDeviceSize(void) {
-    // Portrait size in points. On iOS 6 and 7, UIScreen bounds don't rotate.
+    // Portrait size in points. On iOS 6, UIScreen bounds don't rotate.
     CGSize s = [UIScreen mainScreen].bounds.size;
     return CGSizeMake(MIN(s.width, s.height), MAX(s.width, s.height));
 }
@@ -135,7 +135,7 @@ static void SSSetTextAutosizingWidth(id self, SEL _cmd, float width) {
     SSOrigSetTextAutosizingWidth(self, _cmd, scale ? width / scale.floatValue : width);
 }
 
-// WebKit on iOS 6 and 7 runs WebCore on its own "WebThread". Anything that calls into WebKit from the
+// WebKit on iOS 6 runs WebCore on its own "WebThread". Anything that calls into WebKit from the
 // main thread has to hold the WebThread lock first, as UIKit does, or WebCore may be in the middle of a
 // layout. WebThreadLock() does nothing when already on the WebThread, and the main thread keeps the
 // lock until the end of the current run loop pass.

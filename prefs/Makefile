@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 TARGET := iphone:clang:9.3:6.0
-ARCHS = armv7 arm64
+ARCHS = armv7
 
 include $(THEOS)/makefiles/common.mk
 

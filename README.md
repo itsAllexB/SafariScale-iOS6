@@ -1,8 +1,8 @@
 <p align="center"><img src="icon.png" alt="SafariScale icon" width="128"></p>
 
-<h1 align="center">SafariScale (iOS 6–7)</h1>
+<h1 align="center">SafariScale (iOS 6)</h1>
 
-**Makes web pages in Safari smaller on iOS 6 and 7.**
+**Makes web pages in Safari smaller on iOS 6.**
 
 Modern websites are made for phones that are much bigger than an iPhone 4S. On a 3.5-inch screen they look cramped: big text, huge buttons and very little on screen at once. SafariScale shows pages at 80% of their size by default, or anywhere from 50% to 100%, so more fits on the screen.
 
@@ -20,7 +20,7 @@ This is an unofficial jailbreak tweak. It is not affiliated with or endorsed by 
   - Desktop sites with no mobile layout and pages with a fixed width are left alone, because Safari already fits those to the screen.
 - **A real layout, not a picture scaled down.** At 80% an iPhone page is laid out 400 px wide instead of 320 px, so the site's own CSS decides how to use the room, and scripts see the same width.
 - **Open pages update in place** when you change the size in Settings and go back to Safari. Nothing reloads, and what you typed into forms stays.
-- **Works with [Web Port](http://lululab.net/)** (lululab's modern WebKit for iOS 6) and with Safari's own engine. Nothing to set up: SafariScale works with whichever engine Safari is using.
+- **Works with [Web Port](http://lululab.net/)** (lululab's modern WebKit for iOS 6) and with Safari's own engine. Nothing to set up: SafariScale works with whichever engine Safari is using, and Web Port's own zoom controls (long-press the toolbar) work on top of it.
 - **Text stays in proportion.** iOS normally enlarges text it thinks is too small to read on a zoomed-out page, which would undo the change on many sites. SafariScale adjusts that too, so text shrinks along with everything else.
 - Nothing is added to Safari itself. All settings are in the Settings app.
 
@@ -39,14 +39,14 @@ iPhone 4S, iOS 6.1.3, with Web Port. Each site at 100% (iOS default), 80% (Safar
 ## Compatibility
 
 - Tested on an iPhone 4S with iOS 6.1.3 and Cydia Substrate, with Web Port 1.0.0 and with Safari's own engine: every page size, switching sizes and turning it off and on with pages open.
-- Built for iOS 6.0 to 7.x (armv7 and arm64). iOS 7 hasn't been tested on a device yet.
+- For iOS 6.x (armv7). It is limited to iOS 6 because that is what it has been tested on.
 - Only Safari is changed. Other apps and home-screen web apps keep the normal size.
 
 ## Install
 
-Download the `.deb` from [Releases](https://github.com/itsAllexB/SafariScale-iOS6-7/releases/latest) and install it with iFile, Filza or `dpkg -i`. Then close Safari from the app switcher and open it again.
+Download the `.deb` from [Releases](https://github.com/itsAllexB/SafariScale-iOS6/releases/latest) and install it with iFile, Filza or `dpkg -i`. Then close Safari from the app switcher and open it again.
 
-Requires Cydia Substrate (`mobilesubstrate`) and PreferenceLoader. Both are on almost every iOS 6 or 7 jailbreak.
+Requires Cydia Substrate (`mobilesubstrate`) and PreferenceLoader. Both are on almost every iOS 6 jailbreak.
 
 ## Settings
 
@@ -60,8 +60,8 @@ Open **Settings > Safari Scale**:
 You need [Theos](https://theos.dev/docs/installation) and the iOS 9.3 SDK from [theos/sdks](https://github.com/theos/sdks). It's the newest one that still builds armv7, which iOS 6 devices need.
 
 ```sh
-git clone https://github.com/itsAllexB/SafariScale-iOS6-7.git
-cd SafariScale-iOS6-7
+git clone https://github.com/itsAllexB/SafariScale-iOS6.git
+cd SafariScale-iOS6
 make package FINALPACKAGE=1
 ```
 

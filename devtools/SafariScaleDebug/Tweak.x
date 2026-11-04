@@ -28,7 +28,7 @@ static BOOL SDShown(UIView *view) {
     return view.window != nil;
 }
 
-// WebKit on iOS 6 and 7 runs WebCore on its own "WebThread". Anything that calls into WebKit from the
+// WebKit on iOS 6 runs WebCore on its own "WebThread". Anything that calls into WebKit from the
 // main thread has to hold the WebThread lock first, as UIKit does, or WebCore may be in the middle of a
 // layout. WebThreadLock() does nothing when already on the WebThread, and the main thread keeps the
 // lock until the end of the current run loop pass.
