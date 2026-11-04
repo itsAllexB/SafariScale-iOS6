@@ -13,8 +13,9 @@ include $(THEOS)/makefiles/common.mk
 TWEAK_NAME = SafariScale
 SafariScale_FILES = Tweak.x
 SafariScale_FRAMEWORKS = UIKit
-# The iOS 9.3 SDK ships old module.map files that current clang rejects, so no modules.
-SafariScale_CFLAGS = -fobjc-arc -fno-modules
+# The iOS 9.3 SDK ships old module.map files that current clang rejects, so no clang modules.
+SafariScale_USE_MODULES = 0
+SafariScale_CFLAGS = -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 

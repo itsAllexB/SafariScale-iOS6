@@ -9,6 +9,7 @@ SafariScalePrefs_FILES = SSCRootListController.m
 SafariScalePrefs_FRAMEWORKS = UIKit
 SafariScalePrefs_PRIVATE_FRAMEWORKS = Preferences
 SafariScalePrefs_INSTALL_PATH = /Library/PreferenceBundles
-SafariScalePrefs_CFLAGS = -fobjc-arc -fno-modules
+SafariScalePrefs_USE_MODULES = 0
+SafariScalePrefs_CFLAGS = -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/bundle.mk
