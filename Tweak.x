@@ -137,19 +137,36 @@ static void SSSetTextAutosizingWidth(id self, SEL _cmd, float width) {
 
 // WebKit on iOS 6 and 7 runs WebCore on its own "WebThread". Anything that calls into WebKit from the
 // main thread has to hold the WebThread lock first, as UIKit does, or WebCore may be in the middle of a
-// layout.
-// WebThreadLock() does nothing when already on the WebThread, and the main thread keeps the lock until
-// the end of the current run loop pass. Looked up at run time: it lives in Apple's WebCore or Web Port's.
-static void SSWebThreadLock(void) {
-    static void (*lock)(void);
-    static dispatch_once_t once;
-    dispatch_once(&once, ^{ lock = (void (*)(void))dlsym(RTLD_DEFAULT, "WebThreadLock"); });
+// layout. WebThreadLock() does nothing when already on the WebThread, and the main thread keeps the
+// lock until the end of the current run loop pass.
+// With Web Port, Safari has two WebCores loaded (Apple's and Web Port's in /var/wkd), each with its own
+// WebThreadLock, and dlsym(RTLD_DEFAULT) finds Apple's. So the lock is taken from the WebCore next to
+// the WebKit that the given object (a WebView or WebFrame) comes from.
+static void SSWebThreadLockFor(id webKitObject) {
+    static NSMutableDictionary *locks;   // WebKit image path -> lock function
+    if (!webKitObject) return;
+    Dl_info info;
+    if (!dladdr((__bridge const void *)[webKitObject class], &info) || !info.dli_fname) return;
+    NSString *kit = @(info.dli_fname);
+    if (!locks) locks = [NSMutableDictionary dictionary];
+    NSValue *cached = locks[kit];
+    void (*lock)(void) = (void (*)(void))cached.pointerValue;
+    if (!cached) {
+        // .../WebKit.framework/WebKit or .../WebKitLegacy.framework/WebKitLegacy -> .../WebCore.framework/WebCore
+        NSString *core = [[[kit stringByDeletingLastPathComponent] stringByDeletingLastPathComponent]
+                          stringByAppendingPathComponent:@"WebCore.framework/WebCore"];
+        void *image = dlopen(core.fileSystemRepresentation, RTLD_LAZY | RTLD_NOLOAD);
+        lock = image ? (void (*)(void))dlsym(image, "WebThreadLock") : NULL;
+        if (!lock) lock = (void (*)(void))dlsym(RTLD_DEFAULT, "WebThreadLock");
+        locks[kit] = [NSValue valueWithPointer:(const void *)lock];
+    }
     if (lock) lock();
 }
 
 static void SSUpdateTextAutosizing(UIWebDocumentView *view, CGFloat scale) {
-    SSWebThreadLock();
-    WebFrame *frame = [view respondsToSelector:@selector(webView)] ? [[view webView] mainFrame] : nil;
+    WebView *webView = [view respondsToSelector:@selector(webView)] ? [view webView] : nil;
+    SSWebThreadLockFor(webView);
+    WebFrame *frame = [webView mainFrame];
     SEL sel = @selector(_setTextAutosizingWidth:);
     if (![frame respondsToSelector:sel]) return;
     if (!SSOrigSetTextAutosizingWidth)
@@ -193,10 +210,11 @@ static char kSSOriginalArgumentsKey;
 
 static void SSReapplyAll(void) {
     gNeedsReapply = NO;
-    SSWebThreadLock();   // this runs on the main thread, outside any UIKit call that would take it
     for (UIWebDocumentView *view in [gScaledViews allObjects]) {
         NSDictionary *original = objc_getAssociatedObject(view, &kSSOriginalArgumentsKey);
         if (!original) continue;
+        // This runs on the main thread, outside any UIKit call that would take the lock.
+        if ([view respondsToSelector:@selector(webView)]) SSWebThreadLockFor([view webView]);
         unsigned int changed = [view _applyViewportArguments:original];
         if ([view respondsToSelector:@selector(viewportConfigurationsDidChange:)])
             [view viewportConfigurationsDidChange:changed];

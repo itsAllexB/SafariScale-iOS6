@@ -28,10 +28,36 @@ static BOOL SDShown(UIView *view) {
     return view.window != nil;
 }
 
+// WebKit on iOS 6 and 7 runs WebCore on its own "WebThread". Anything that calls into WebKit from the
+// main thread has to hold the WebThread lock first, as UIKit does, or WebCore may be in the middle of a
+// layout. WebThreadLock() does nothing when already on the WebThread, and the main thread keeps the
+// lock until the end of the current run loop pass.
+// With Web Port, Safari has two WebCores loaded (Apple's and Web Port's in /var/wkd), each with its own
+// WebThreadLock, and dlsym(RTLD_DEFAULT) finds Apple's. So the lock is taken from the WebCore next to
+// the WebKit that the given object (a WebView or WebFrame) comes from.
+static void SDWebThreadLockFor(id webKitObject) {
+    static NSMutableDictionary *locks;   // WebKit image path -> lock function
+    if (!webKitObject) return;
+    Dl_info info;
+    if (!dladdr((__bridge const void *)[webKitObject class], &info) || !info.dli_fname) return;
+    NSString *kit = @(info.dli_fname);
+    if (!locks) locks = [NSMutableDictionary dictionary];
+    NSValue *cached = locks[kit];
+    void (*lock)(void) = (void (*)(void))cached.pointerValue;
+    if (!cached) {
+        // .../WebKit.framework/WebKit or .../WebKitLegacy.framework/WebKitLegacy -> .../WebCore.framework/WebCore
+        NSString *core = [[[kit stringByDeletingLastPathComponent] stringByDeletingLastPathComponent]
+                          stringByAppendingPathComponent:@"WebCore.framework/WebCore"];
+        void *image = dlopen(core.fileSystemRepresentation, RTLD_LAZY | RTLD_NOLOAD);
+        lock = image ? (void (*)(void))dlsym(image, "WebThreadLock") : NULL;
+        if (!lock) lock = (void (*)(void))dlsym(RTLD_DEFAULT, "WebThreadLock");
+        locks[kit] = [NSValue valueWithPointer:(const void *)lock];
+    }
+    if (lock) lock();
+}
+
 static void SDRun(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef info) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        void (*lock)(void) = (void (*)(void))dlsym(RTLD_DEFAULT, "WebThreadLock");
-        if (lock) lock();
         NSString *script = [NSString stringWithContentsOfFile:@"/tmp/ssdebug.js" encoding:NSUTF8StringEncoding error:NULL];
         NSMutableArray *found = [NSMutableArray array];
         NSMutableString *trace = [NSMutableString string];
@@ -41,7 +67,10 @@ static void SDRun(CFNotificationCenterRef center, void *observer, CFStringRef na
         NSString *result;
         if (!script) result = @"ERROR: no /tmp/ssdebug.js";
         else if (!view) result = [NSString stringWithFormat:@"ERROR: no visible web view (%lu found)\n%@", (unsigned long)found.count, trace];
-        else result = [[view webView] stringByEvaluatingJavaScriptFromString:script] ?: @"(nil)";
+        else {
+            SDWebThreadLockFor([view webView]);
+            result = [[view webView] stringByEvaluatingJavaScriptFromString:script] ?: @"(nil)";
+        }
         [result writeToFile:@"/tmp/ssdebug.out" atomically:NO encoding:NSUTF8StringEncoding error:NULL];
     });
 }
