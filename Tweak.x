@@ -39,6 +39,7 @@
 
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
+#import <dlfcn.h>
 #import <substrate.h>
 
 #define kSSDomain CFSTR("com.itsallexb.safariscale")
@@ -134,7 +135,20 @@ static void SSSetTextAutosizingWidth(id self, SEL _cmd, float width) {
     SSOrigSetTextAutosizingWidth(self, _cmd, scale ? width / scale.floatValue : width);
 }
 
+// WebKit on iOS 6 and 7 runs WebCore on its own "WebThread". Anything that calls into WebKit from the
+// main thread has to hold the WebThread lock first, as UIKit does, or WebCore may be in the middle of a
+// layout (calling -resetTextAutosizingBeforeLayout without it crashed Web Port's WebCore on the 4S).
+// WebThreadLock() does nothing when already on the WebThread, and the main thread keeps the lock until
+// the end of the current run loop pass. Looked up at run time: it lives in Apple's WebCore or Web Port's.
+static void SSWebThreadLock(void) {
+    static void (*lock)(void);
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{ lock = (void (*)(void))dlsym(RTLD_DEFAULT, "WebThreadLock"); });
+    if (lock) lock();
+}
+
 static void SSUpdateTextAutosizing(UIWebDocumentView *view, CGFloat scale) {
+    SSWebThreadLock();
     WebFrame *frame = [view respondsToSelector:@selector(webView)] ? [[view webView] mainFrame] : nil;
     SEL sel = @selector(_setTextAutosizingWidth:);
     if (![frame respondsToSelector:sel]) return;
@@ -180,6 +194,7 @@ static char kSSOriginalArgumentsKey;
 
 static void SSReapplyAll(void) {
     gNeedsReapply = NO;
+    SSWebThreadLock();   // this runs on the main thread, outside any UIKit call that would take it
     for (UIWebDocumentView *view in [gScaledViews allObjects]) {
         NSDictionary *original = objc_getAssociatedObject(view, &kSSOriginalArgumentsKey);
         if (!original) continue;
