@@ -4,7 +4,7 @@
 
 **Makes web pages in Safari smaller on iOS 6.**
 
-Modern websites are made for phones that are much bigger than an iPhone 4S. On a 3.5-inch screen they look cramped: big text, huge buttons and very little on screen at once. SafariScale shows pages at 80% of their size by default, or anywhere from 50% to 100%, so more fits on the screen.
+Modern websites are made for phones that are much bigger. On a 3.5-inch screen they look cramped: big text, huge buttons and very little on screen at once. SafariScale shows pages at 80% of their size by default, or anywhere from 30% to 100%, so more fits on the screen.
 
 It works like zooming out in a desktop browser. The page gets a wider layout and is shown smaller. So nothing is cut off or broken: links, forms, menus, pinch zoom and rotation all keep working.
 
@@ -14,7 +14,7 @@ This is an unofficial jailbreak tweak. It is not affiliated with or endorsed by 
 
 ## Features
 
-- **Page Size:** 50%, 60%, 70%, 80% (default), 90% or 100% (the normal iOS size).
+- **Page Size:** 30% to 100% in steps of 10%: 80% is the default, 100% is the normal iOS size.
 - **Only pages made for phones change:**
   - Sites that size themselves to the screen (almost every modern site) are shown smaller.
   - Desktop sites with no mobile layout and pages with a fixed width are left alone, because Safari already fits those to the screen.
@@ -26,15 +26,15 @@ This is an unofficial jailbreak tweak. It is not affiliated with or endorsed by 
 
 ## Screenshots
 
-iPhone 4S, iOS 6.1.3, with Web Port. Each site at 100% (iOS default), 80% (SafariScale default) and 70%.
+iPhone 4S, iOS 6.1.3, with Web Port. Each site at 100% (iOS default), 80% (SafariScale default) and 50%. Google is the English version of Google Japan.
 
-<img src="screenshots/google.png" alt="Google at 100%, 80% and 70%: at 100% the top bar doesn't fit and Images wraps under All; at 80% and 70% it fits and the trending searches show" width="760">
+<img src="screenshots/google.png" alt="Google search for iPhone 4S at 100%, 80% and 50%: more of the tabs and results fit as the page gets smaller" width="760">
 
-<img src="screenshots/youtube.png" alt="YouTube search results at 100%, 80% and 70%: smaller thumbnails and text, more results on screen" width="760">
+<img src="screenshots/youtube.png" alt="The same YouTube search results at 100%, 80% and 50%: smaller thumbnails and text, more results on screen" width="760">
 
-<img src="screenshots/wikipedia.png" alt="Wikipedia article at 100%, 80% and 70%: more of the article on each screen" width="760">
+<img src="screenshots/wikipedia.png" alt="Wikipedia article at 100%, 80% and 50%: more of the article on each screen" width="760">
 
-<img src="screenshots/hn.png" alt="Hacker News at 100%, 80% and 70%: about 3, 6 and 8 stories on screen" width="760">
+<img src="screenshots/hn.png" alt="Hacker News at 100%, 80% and 50%: about 3, 6 and 14 stories on screen" width="760">
 
 ## Compatibility
 
@@ -61,7 +61,7 @@ Requires Cydia Substrate (`mobilesubstrate`) and PreferenceLoader. Both are on a
 Open **Settings > Safari Scale**:
 
 - **Enabled**: turns the tweak on or off.
-- **Page Size**: 50% to 100% in steps of 10%. 80% is the default.
+- **Page Size**: 30% to 100% in steps of 10%. 80% is the default.
 
 <img src="screenshots/settings.png" alt="Safari Scale settings page: Enabled switch and Page Size 80%" width="320">
 
