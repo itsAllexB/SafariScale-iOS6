@@ -236,6 +236,9 @@ static void SSPreferencesChanged(CFNotificationCenterRef center, void *observer,
 
 %ctor {
     @autoreleasepool {
+        // The Bundles filter also matches webbookmarksd, a daemon inside MobileSafari.app with Safari's
+        // bundle id. Only the Safari app itself shows web pages.
+        if (![[NSProcessInfo processInfo].processName isEqualToString:@"MobileSafari"]) return;
         if (![UIWebDocumentView instancesRespondToSelector:@selector(_applyViewportArguments:)]) {
             NSLog(@"[SafariScale] -[UIWebDocumentView _applyViewportArguments:] not found; not loading.");
             return;

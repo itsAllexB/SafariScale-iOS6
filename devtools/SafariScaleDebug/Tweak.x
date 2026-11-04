@@ -76,6 +76,8 @@ static void SDRun(CFNotificationCenterRef center, void *observer, CFStringRef na
 }
 
 %ctor {
+    // Not in webbookmarksd, which shares Safari's bundle id.
+    if (![[NSProcessInfo processInfo].processName isEqualToString:@"MobileSafari"]) return;
     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, SDRun,
                                     CFSTR("com.itsallexb.safariscale.debug/run"), NULL,
                                     CFNotificationSuspensionBehaviorDeliverImmediately);
