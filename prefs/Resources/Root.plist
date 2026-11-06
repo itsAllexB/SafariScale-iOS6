@@ -39,6 +39,8 @@
 			<string>com.itsallexb.safariscale</string>
 			<key>detail</key>
 			<string>PSListItemsController</string>
+			<key>id</key>
+			<string>SAFARI_SCALE_PAGE_SIZE</string>
 			<key>key</key>
 			<string>percent</string>
 			<key>label</key>
