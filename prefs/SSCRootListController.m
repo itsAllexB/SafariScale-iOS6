@@ -16,7 +16,37 @@
 - (void)setPreferenceValue:(id)value specifier:(PSSpecifier *)specifier;
 @end
 
+@interface PSViewController : UIViewController
+@end
+
 @interface SSCRootListController : PSListController
+@end
+
+// "About Safari Scale…", the last row of the page: a plain page of text, like General > About > Legal.
+@interface SSCAboutController : PSViewController
+@end
+
+@implementation SSCAboutController
+
+- (id)init {
+    if ((self = [super init])) self.title = [[NSBundle bundleForClass:[self class]] localizedStringForKey:@"ABOUT_TITLE" value:@"" table:@"Root"];
+    return self;
+}
+
+- (void)loadView {
+    UITextView *text = [[UITextView alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
+    text.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    text.editable = NO;
+    text.font = [UIFont systemFontOfSize:15];
+    text.text = [[NSBundle bundleForClass:[self class]] localizedStringForKey:@"ABOUT_TEXT" value:@"" table:@"Root"];
+    self.view = text;
+}
+
+// When Settings goes to the background it asks the pages below its main list for -table.
+- (UITableView *)table {
+    return nil;
+}
+
 @end
 
 @implementation SSCRootListController

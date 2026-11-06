@@ -8,7 +8,7 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
-			<string>Makes web pages in Safari smaller, so modern sites made for bigger phones stop looking cramped. Pages are laid out wider and shown smaller, like zooming out in a desktop browser, so links, forms, pinch zoom and rotation keep working.</string>
+			<string>Makes web pages in Safari smaller, so more fits on the screen.</string>
 		</dict>
 		<dict>
 			<key>PostNotification</key>
@@ -27,10 +27,6 @@
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
-			<key>footerText</key>
-			<string>At 80%, text and images are shown at 80% of their usual size and pages get 25% more room in each direction. Pages that already show their desktop version are not changed.
-
-Pages that are already open update when you go back to Safari.</string>
 		</dict>
 		<dict>
 			<key>PostNotification</key>
@@ -80,6 +76,18 @@ Pages that are already open update when you go back to Safari.</string>
 				<integer>90</integer>
 				<integer>100</integer>
 			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+			<key>detail</key>
+			<string>SSCAboutController</string>
+			<key>label</key>
+			<string>About Safari Scale…</string>
 		</dict>
 	</array>
 	<key>title</key>
