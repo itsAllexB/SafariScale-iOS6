@@ -62,8 +62,11 @@ Open **Settings > Safari Scale**:
 
 - **Enabled**: turns the tweak on or off.
 - **Page Size**: 30% to 100% in steps of 10%. 80% is the default.
+- **About Safari Scale…**: how it works, on a page of its own.
 
-<img src="screenshots/settings.png" alt="Safari Scale settings page: Enabled switch and Page Size 80%" width="320">
+The page is in English and Romanian.
+
+<img src="screenshots/settings.png" alt="Safari Scale settings page: Enabled switch, Page Size 80% and About Safari Scale" width="320">
 
 ## Build from source
 
