@@ -42,6 +42,7 @@ iPhone 4S, iOS 6.1.3, with Web Port. Each site at 100% (iOS default), 80% (Safar
 - 200 pages in a row in one tab (two of every three sized to the device), on an emulated iPhone 4 with iOS 6.1.3, at 80%: memory flat after the first 70 pages (heap 3.5 to 3.9 MB, resident about 36 MB), one web view throughout.
 - For iOS 6.x (armv7). It is limited to iOS 6 because that is what it has been tested on.
 - Only Safari is changed. Other apps and home-screen web apps keep the normal size.
+- On an iPad (reviewed, not run: no iOS 6 iPad can be emulated): it reads the screen's width, 768 points, in either orientation, so nothing points to a problem.
 
 ## Install
 
