@@ -39,6 +39,7 @@ iPhone 4S, iOS 6.1.3, with Web Port. Each site at 100% (iOS default), 80% (Safar
 ## Compatibility
 
 - Tested on an iPhone 4S with iOS 6.1.3 and Cydia Substrate, with Web Port 1.0.0 and with Safari's own engine: every page size, switching sizes and turning it off and on with pages open.
+- 200 pages in a row in one tab (two of every three sized to the device), on an emulated iPhone 4 with iOS 6.1.3, at 80%: memory flat after the first 70 pages (heap 3.5 to 3.9 MB, resident about 36 MB), one web view throughout.
 - For iOS 6.x (armv7). It is limited to iOS 6 because that is what it has been tested on.
 - Only Safari is changed. Other apps and home-screen web apps keep the normal size.
 
