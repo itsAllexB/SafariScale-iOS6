@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 itsAllexB
+// Copyright (C) 2026 AllexB
 
 // SafariScale 1.1.0
 // Makes web pages in Safari (iOS 6) smaller, like zooming out in a desktop browser.

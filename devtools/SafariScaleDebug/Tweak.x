@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 itsAllexB
+// Copyright (C) 2026 AllexB
 //
 // SafariScaleDebug (dev only): when com.itsallexb.safariscale.debug/run is posted, runs /tmp/ssdebug.js in
 // the page Safari is showing and writes the result (or an error) to /tmp/ssdebug.out.

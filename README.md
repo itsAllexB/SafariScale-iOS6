@@ -84,7 +84,7 @@ The package is written to `packages/`. GitHub Actions builds it on every push (s
 
 ## Credits and license
 
-Made by [itsAllexB](https://github.com/itsAllexB).
+Made by [AllexB](https://github.com/itsAllexB).
 
 SafariScale is free software under the GNU General Public License v3.0 or later. See [LICENSE](LICENSE).
 
